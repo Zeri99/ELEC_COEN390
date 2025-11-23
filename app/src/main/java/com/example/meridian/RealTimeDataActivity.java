@@ -308,7 +308,7 @@ public class RealTimeDataActivity extends AppCompatActivity {
 
             tvGz.setText(sb.toString());
 
-            tryAutoReportIfNeeded(fAzMax60s, fLat, fLon);
+            tryAutoReportIfNeeded(fAz, fLat, fLon);
         });
     }
 
@@ -316,11 +316,11 @@ public class RealTimeDataActivity extends AppCompatActivity {
      * Attempt to report a pothole automatically.
      * UPDATED: Now fetches user's vehicle type before saving.
      */
-    private void tryAutoReportIfNeeded(Double fAzMax60s, Double fLat, Double fLon) {
-        if (fAzMax60s == null || fLat == null || fLon == null) return;
+    private void tryAutoReportIfNeeded(Double fAz, Double fLat, Double fLon) {
+        if (fAz == null || fLat == null || fLon == null) return;
         if (reportingInProgress.get()) return;
 
-        if (fAzMax60s < REPORT_THRESHOLD_AZ) return;
+        if (fAz < REPORT_THRESHOLD_AZ) return;
 
         long now = System.currentTimeMillis();
         if (now - lastReportTime < MIN_REPORT_INTERVAL_MS) {
@@ -347,7 +347,7 @@ public class RealTimeDataActivity extends AppCompatActivity {
                     }
 
                     // Create the Pothole with the vehicle type
-                    Pothole pothole = new Pothole(fLat, fLon, fAzMax60s);
+                    Pothole pothole = new Pothole(fLat, fLon, fAz);
                     pothole.setVehicleType(myVehicleType);
                     pothole.setDetectedBy(userId); // Ensure detectedBy is set to real user ID
 
@@ -356,7 +356,7 @@ public class RealTimeDataActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> {
                     Log.e("RT", "Failed to fetch user vehicle", e);
                     // If fetch fails, upload anyway with "Unknown" (or default null)
-                    Pothole pothole = new Pothole(fLat, fLon, fAzMax60s);
+                    Pothole pothole = new Pothole(fLat, fLon, fAz);
                     pothole.setDetectedBy(userId);
                     uploadPothole(pothole, fLat, fLon);
                 });
